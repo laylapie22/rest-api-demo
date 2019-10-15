@@ -2,6 +2,8 @@ const express = require('express')
 const faker = require('faker')
 
 const app = express()
+//enable parsing of json objects, by default this is not enabled in express
+app.use(express.json())
 
 const port = 8080
 
@@ -28,7 +30,7 @@ app.get('/employees', (req,res) => {
     }
     res.send(employees)
 })
-
+//get employee by id number
 app.get('/employee/:id' ,(req,res) => {
     const id = req.params.id
     if(!id) {
@@ -40,7 +42,36 @@ app.get('/employee/:id' ,(req,res) => {
         res.send(employee)
     }
 })
+//to be able to add employee in the body
+app.post('/employee',(req,res) => {
+    const employee = {
+        id: employees.length + 1,
+        name: req.body.name,
+        email: req.body.email,
+        address: req.body.address,
+        job: req.body.job,
+        company: req.body.company
+    }
+    employees.push(employee)
+    res.send(employee)
+})
+//to be able to update employee in the body
+app.put('/employee/:id', (req,res) => {
+    const id = req.params.id
+    if(!id) {
+        res.send("employee not found")
+    } 
+    const employee = employees.find( (e) => {
+            return e.id === parseInt(id)
+    })
+   
+    employee.address = req.body.address
+    employee.job = req.body.job
+    employee.company = req.body.company
+    res.send(employee)
+})
 
+//searches for employee with query
 const searchEmployees = (req,res) => {
     const search = req.query.search.toLowerCase()
     const result = employees.filter( e => {
